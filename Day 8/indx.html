@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Character Counter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    textarea {
+      width: 400px;
+      height: 180px;
+      padding: 16px 20px;
+      font-size: 1rem;
+      border-radius: 16px;
+      border: 2px solid #00d4ff;
+      background: #1a1a1a;
+      color: white;
+      outline: none;
+      resize: none;
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      transition: border 0.3s;
+    }
+
+    textarea.danger { border-color: #ff4444; }
+
+    textarea::placeholder { color: #555; }
+
+    .counter-box {
+      width: 400px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    #counter {
+      font-size: 1rem;
+      color: #ffffff88;
+      transition: color 0.3s;
+    }
+
+    #counter.danger { color: #ff4444; }
+
+    #wordCount {
+      font-size: 1rem;
+      color: #ffffff55;
+    }
+
+    .progress-bar {
+      width: 400px;
+      height: 6px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0%;
+      background: #00d4ff;
+      border-radius: 10px;
+      transition: width 0.2s, background 0.3s;
+    }
+
+    #progress.danger { background: #ff4444; }
+  </style>
+</head>
+<body>
+
+  <h1>✍️ CHARACTER COUNTER</h1>
+
+  <textarea id="textArea" placeholder="Start typing here..."></textarea>
+
+  <div class="counter-box">
+    <span id="counter">0 / 200</span>
+    <span id="wordCount">0 words</span>
+  </div>
+
+  <div class="progress-bar">
+    <div id="progress"></div>
+  </div>
+
+  <script>
+    // HTML se elements pakad liye
+    const textArea = document.getElementById('textArea');
+    const counter = document.getElementById('counter');
+    const wordCount = document.getElementById('wordCount');
+    const progress = document.getElementById('progress');
+
+    // maximum limit set ki — 200 characters
+    const maxLimit = 200;
+
+    // textarea mein kuch bhi type hone pe ye function chalega
+    textArea.addEventListener('input', () => {
+
+      // textarea ki current value li
+      const text = textArea.value;
+
+      // text ki length nikali — kitne characters hain
+      const charCount = text.length;
+
+      // words count kiye — split kiya spaces pe — empty strings hataye
+      const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+
+      // counter update kiya — current / max format mein
+      counter.textContent = `${charCount} / ${maxLimit}`;
+
+      // word count update kiya
+      wordCount.textContent = `${words} words`;
+
+      // progress bar ki width calculate ki — percentage mein
+      const percent = (charCount / maxLimit) * 100;
+      progress.style.width = `${Math.min(percent, 100)}%`;
+
+      // agar limit se zyada ho jaye toh red kar do
+      if (charCount >= maxLimit) {
+        counter.classList.add('danger');
+        textArea.classList.add('danger');
+        progress.classList.add('danger');
+      } else {
+
+        // wapas normal color
+        counter.classList.remove('danger');
+        textArea.classList.remove('danger');
+        progress.classList.remove('danger');
+      }
+    });
+  </script>
+
+</body>
+</html>

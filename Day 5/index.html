@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 280px;
+      padding: 14px 20px;
+      border-radius: 50px;
+      border: 2px solid #00d4ff;
+      background: #1a1a1a;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input::placeholder { color: #555; }
+
+    button {
+      padding: 14px 25px;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button:active { transform: scale(0.95); }
+
+    #todoList {
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .todo-item {
+      background: #1a1a1a;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border-left: 4px solid #00d4ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .todo-item.done {
+      border-left-color: #00ff88;
+      opacity: 0.5;
+      text-decoration: line-through;
+      color: #aaa;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .actions button {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      border-radius: 20px;
+    }
+
+    .doneBtn { background: #00ff88; }
+    .deleteBtn { background: #ff4444; color: white; }
+  </style>
+</head>
+<body>
+
+  <h1>✅ TO-DO LIST</h1>
+
+  <div class="input-area">
+    <input type="text" id="taskInput" placeholder="Enter your task..." />
+    <button id="addBtn">ADD</button>
+  </div>
+
+  <div id="todoList"></div>
+
+  <script>
+    // HTML se elements pakad liye
+const addBtn = document.getElementById('addBtn');
+const taskInput = document.getElementById('taskInput');
+const todoList = document.getElementById('todoList');
+
+// add button click hone pe ye function chalega
+addBtn.addEventListener('click', () => {
+
+  // input field ki value li aur extra spaces hataye
+  const task = taskInput.value.trim();
+
+  // agar input empty ho toh kuch mat karo
+  if (task === '') return;
+
+  // naya div element banaya — ye ek todo item hoga
+  const item = document.createElement('div');
+
+  // CSS class lagai taake styling apply ho
+  item.classList.add('todo-item');
+
+  // item ke andar task text aur buttons inject kiye
+  item.innerHTML = `
+    <span>${task}</span>
+    <div class="actions">
+      <button class="doneBtn">✔ Done</button>
+      <button class="deleteBtn">✖ Delete</button>
+    </div>
+  `;
+
+  // done button pakda aur click event lagaya
+  item.querySelector('.doneBtn').addEventListener('click', () => {
+
+    // done class toggle karti hai — ek baar lagao, ek baar hatao
+    item.classList.toggle('done');
+  });
+
+  // delete button pakda aur click event lagaya
+  item.querySelector('.deleteBtn').addEventListener('click', () => {
+
+    // item ko list se hata diya
+    item.remove();
+  });
+
+  // naya item todo list mein add kar diya
+  todoList.appendChild(item);
+
+  // input field clear kar diya next task ke liye
+  taskInput.value = '';
+});
+
+// Enter key press hone pe bhi task add ho jaye
+taskInput.addEventListener('keypress', (e) => {
+
+  // e.key check karta hai kaunsi key press hui
+  if (e.key === 'Enter') addBtn.click();
+});
+  </script>
+
+</body>
+</html>

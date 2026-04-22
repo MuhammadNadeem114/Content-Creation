@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Changer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      transition: background 0.4s ease;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 10px;
+      letter-spacing: 3px;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #ffffff99;
+      margin-bottom: 40px;
+      id="colorCode">#0f0f0f
+    }
+
+    p#colorCode {
+      font-size: 1.2rem;
+      color: white;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+    }
+
+    button {
+      padding: 16px 50px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 50px;
+      background: white;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button:active { transform: scale(0.95); }
+  </style>
+</head>
+<body>
+
+  <h1>COLOR CHANGER</h1>
+  <p id="colorCode">#0f0f0f</p>
+  <button id="btn">CHANGE COLOR</button>
+
+  //==> JavaScript starts here
+
+  <script>
+
+   const btn = document.getElementById('btn');
+const colorCode = document.getElementById('colorCode');
+
+btn.addEventListener('click', () => {
+  const random = '#' + Math.floor(Math.random() * 0xffffff)
+  
+  //Math.random() ek random number deta hai — 0xffffff matlab
+  //  16 million colors mein se koi bhi!
+
+                           .toString(16)
+                           .padStart(6, '0');
+
+  //toString(16) use hex color mein convert karta hai — wahi
+  //  jo CSS mein use hota hai. padStart ensure karta hai 6 digits hon hamesha
+
+
+  document.body.style.background = random;
+  colorCode.textContent = random;
+
+  //Body ka background change kiya aur color code bhi screen pe show
+  //  kar diya — done!
+
+
+});
+
+  </script>
+
+</body>
+</html>

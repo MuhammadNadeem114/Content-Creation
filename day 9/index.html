@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    #quizBox {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 30px;
+      width: 420px;
+      border: 1px solid #ffffff11;
+    }
+
+    #questionNo {
+      color: #ffffff44;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    #question {
+      color: white;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .option {
+      background: #252525;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .option:hover { border-color: #00d4ff; }
+
+    .option.correct {
+      background: #00ff8822;
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+
+    .option.wrong {
+      background: #ff444422;
+      border-color: #ff4444;
+      color: #ff4444;
+    }
+
+    .option.disabled { pointer-events: none; }
+
+    #nextBtn {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    #nextBtn:active { transform: scale(0.98); }
+
+    #scoreBox {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #scoreBox h2 {
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    #scoreBox p {
+      color: #00d4ff;
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    #restartBtn {
+      padding: 14px 40px;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    #scoreBar {
+      color: #ffffff55;
+      font-size: 0.9rem;
+      text-align: right;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 QUIZ APP</h1>
+
+  <div id="quizBox">
+    <div id="scoreBar">Score: <span id="score">0</span></div>
+    <div id="questionNo"></div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <button id="nextBtn">NEXT ➜</button>
+  </div>
+
+  <div id="scoreBox">
+    <h2>Quiz Complete! 🎉</h2>
+    <p id="finalScore"></p>
+    <button id="restartBtn">RESTART</button>
+  </div>
+
+  <script>
+    // sare questions — ek array mein objects ke tor pe
+    const questions = [
+      {
+        question: "JavaScript mein variable declare karne ke liye kya use karte hain?",
+        options: ["int", "let", "var x =", "dim"],
+        answer: 1
+      },
+      {
+        question: "console.log() kya karta hai?",
+        options: ["Alert dikhata hai", "Browser band karta hai", "Browser console mein output deta hai", "Variable delete karta hai"],
+        answer: 2
+      },
+      {
+        question: "Array mein pehle element ka index kya hota hai?",
+        options: ["1", "-1", "0", "null"],
+        answer: 2
+      },
+      {
+        question: "Konsa method array mein element add karta hai?",
+        options: ["push()", "pop()", "shift()", "add()"],
+        answer: 0
+      },
+      {
+        question: "typeof 'hello' ka result kya hoga?",
+        options: ["number", "object", "string", "undefined"],
+        answer: 2
+      }
+    ];
+
+    // HTML se elements pakad liye
+    const questionNo = document.getElementById('questionNo');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('nextBtn');
+    const scoreEl = document.getElementById('score');
+    const quizBox = document.getElementById('quizBox');
+    const scoreBox = document.getElementById('scoreBox');
+    const finalScore = document.getElementById('finalScore');
+    const restartBtn = document.getElementById('restartBtn');
+
+    // current question track karne ke liye
+    let currentIndex = 0;
+
+    // score track karne ke liye
+    let score = 0;
+
+    // question load karne ka function
+    function loadQuestion() {
+
+      // current question object nikala array se
+      const q = questions[currentIndex];
+
+      // question number dikhai
+      questionNo.textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+
+      // question text dikhai
+      questionEl.textContent = q.question;
+
+      // options area clear kiya pehle
+      optionsEl.innerHTML = '';
+
+      // har option ke liye ek div banaya
+      q.options.forEach((opt, index) => {
+
+        // naya option element banaya
+        const div = document.createElement('div');
+        div.classList.add('option');
+        div.textContent = opt;
+
+        // option click hone pe checkAnswer function chalao
+        div.addEventListener('click', () => checkAnswer(index));
+
+        // options area mein add kiya
+        optionsEl.appendChild(div);
+      });
+
+      // next button hide karo naye question pe
+      nextBtn.style.display = 'none';
+    }
+
+    // answer check karne ka function
+    function checkAnswer(selected) {
+
+      // current question ka sahi answer index
+      const correct = questions[currentIndex].answer;
+
+      // sare options pakad liye
+      const options = document.querySelectorAll('.option');
+
+      // sare options disable kar do — dobara click na ho sake
+      options.forEach(opt => opt.classList.add('disabled'));
+
+      // agar selected option sahi hai
+      if (selected === correct) {
+
+        // green class lagao
+        options[selected].classList.add('correct');
+
+        // score badao
+        score++;
+
+        // score update karo screen pe
+        scoreEl.textContent = score;
+
+      } else {
+
+        // galat option red karo
+        options[selected].classList.add('wrong');
+
+        // sahi option green karo
+        options[correct].classList.add('correct');
+      }
+
+      // next button dikhai do
+      nextBtn.style.display = 'block';
+    }
+
+    // next button click hone pe
+    nextBtn.addEventListener('click', () => {
+
+      // next question pe jao
+      currentIndex++;
+
+      // agar aur questions hain toh load karo
+      if (currentIndex < questions.length) {
+        loadQuestion();
+
+      } else {
+
+        // quiz khatam — result dikhao
+        quizBox.style.display = 'none';
+        scoreBox.style.display = 'flex';
+        finalScore.textContent = `${score} / ${questions.length}`;
+      }
+    });
+
+    // restart button — sab reset karo
+    restartBtn.addEventListener('click', () => {
+      currentIndex = 0;
+      score = 0;
+      scoreEl.textContent = 0;
+      quizBox.style.display = 'block';
+      scoreBox.style.display = 'none';
+      loadQuestion();
+    });
+
+    // page load hote hi pehla question load karo
+    loadQuestion();
+  </script>
+
+</body>
+</html>

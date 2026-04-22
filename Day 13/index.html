@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pakistan Weather</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    p.sub {
+      color: #ffffff44;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+
+    .main-wrapper {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 850px;
+      align-items: flex-start;
+    }
+
+    /* ── CITY LIST ── */
+    .city-list {
+      width: 220px;
+      min-width: 220px;
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .city-list::-webkit-scrollbar { width: 4px; }
+    .city-list::-webkit-scrollbar-thumb {
+      background: #00d4ff44;
+      border-radius: 10px;
+    }
+
+    .city-btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: #252525;
+      color: #ffffffcc;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .city-btn:hover {
+      background: #00d4ff22;
+      border-left-color: #00d4ff;
+      color: white;
+    }
+
+    .city-btn.active {
+      background: #00d4ff22;
+      border-left-color: #00d4ff;
+      color: #00d4ff;
+      font-weight: bold;
+    }
+
+    /* ── WEATHER CARD ── */
+    .weather-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    #weatherCard {
+      display: none;
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 35px;
+      border: 1px solid #ffffff11;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #cityName {
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    #province {
+      color: #ffffff55;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+    }
+
+    #weatherIcon { font-size: 5rem; margin: 10px 0; }
+
+    #temp {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+
+    #description {
+      color: #ffffff88;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .details {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .detail-box {
+      flex: 1;
+      min-width: 80px;
+      background: #252525;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .detail-box p {
+      color: #ffffff44;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .detail-box span {
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    #loader {
+      display: none;
+      color: #ffffff55;
+      text-align: center;
+      padding: 40px;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
+      background: #1a1a1a;
+      border-radius: 24px;
+    }
+
+    #errorMsg {
+      display: none;
+      color: #ff4444;
+      text-align: center;
+      padding: 40px;
+      background: #1a1a1a;
+      border-radius: 24px;
+      letter-spacing: 1px;
+    }
+
+    #placeholder {
+      color: #ffffff22;
+      text-align: center;
+      padding: 60px 40px;
+      background: #1a1a1a;
+      border-radius: 24px;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
+      line-height: 2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🇵🇰 PAKISTAN WEATHER</h1>
+  <p class="sub">CLICK ANY CITY — LIVE WEATHER</p>
+
+  <div class="main-wrapper">
+
+    <!-- City List -->
+    <div class="city-list" id="cityList"></div>
+
+    <!-- Weather Side -->
+    <div class="weather-side">
+      <div id="placeholder">🌤️<br><br>City select karo<br>weather dekhne ke liye</div>
+      <div id="loader">Loading weather...</div>
+      <div id="errorMsg">Weather load nahi hua. Dobara try karo.</div>
+
+      <div id="weatherCard">
+        <div id="cityName"></div>
+        <div id="province"></div>
+        <div id="weatherIcon"></div>
+        <div id="temp"></div>
+        <div id="description"></div>
+        <div class="details">
+          <div class="detail-box">
+            <p>HUMIDITY</p>
+            <span id="humidity"></span>
+          </div>
+          <div class="detail-box">
+            <p>WIND</p>
+            <span id="wind"></span>
+          </div>
+          <div class="detail-box">
+            <p>FEELS LIKE</p>
+            <span id="feelsLike"></span>
+          </div>
+          <div class="detail-box">
+            <p>MIN / MAX</p>
+            <span id="minMax"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Pakistan ki tamam major cities — name aur province ke sath
+    const cities = [
+      { name: 'Karachi',        province: 'Sindh' },
+      { name: 'Lahore',         province: 'Punjab' },
+      { name: 'Islamabad',      province: 'Federal Capital' },
+      { name: 'Rawalpindi',     province: 'Punjab' },
+      { name: 'Faisalabad',     province: 'Punjab' },
+      { name: 'Multan',         province: 'Punjab' },
+      { name: 'Peshawar',       province: 'KPK' },
+      { name: 'Quetta',         province: 'Balochistan' },
+      { name: 'Sialkot',        province: 'Punjab' },
+      { name: 'Gujranwala',     province: 'Punjab' },
+      { name: 'Hyderabad',      province: 'Sindh' },
+      { name: 'Sukkur',         province: 'Sindh' },
+      { name: 'Larkana',        province: 'Sindh' },
+      { name: 'Abbottabad',     province: 'KPK' },
+      { name: 'Mardan',         province: 'KPK' },
+      { name: 'Mingora',        province: 'KPK' },
+      { name: 'Dera Ghazi Khan',province: 'Punjab' },
+      { name: 'Sahiwal',        province: 'Punjab' },
+      { name: 'Bahawalpur',     province: 'Punjab' },
+      { name: 'Sargodha',       province: 'Punjab' },
+      { name: 'Gujrat',         province: 'Punjab' },
+      { name: 'Sheikhupura',    province: 'Punjab' },
+      { name: 'Jhang',          province: 'Punjab' },
+      { name: 'Rahim Yar Khan', province: 'Punjab' },
+      { name: 'Kasur',          province: 'Punjab' },
+      { name: 'Okara',          province: 'Punjab' },
+      { name: 'Nawabshah',      province: 'Sindh' },
+      { name: 'Mirpur Khas',    province: 'Sindh' },
+      { name: 'Jacobabad',      province: 'Sindh' },
+      { name: 'Turbat',         province: 'Balochistan' },
+      { name: 'Khuzdar',        province: 'Balochistan' },
+      { name: 'Hub',            province: 'Balochistan' },
+      { name: 'Muzaffarabad',   province: 'AJK' },
+      { name: 'Mirpur',         province: 'AJK' },
+      { name: 'Gilgit',         province: 'GB' },
+      { name: 'Skardu',         province: 'GB' },
+      { name: 'Chitral',        province: 'KPK' },
+      { name: 'Kohat',          province: 'KPK' },
+      { name: 'Bannu',          province: 'KPK' },
+      { name: 'Dera Ismail Khan',province: 'KPK' },
+    ];
+
+    // HTML elements pakad liye
+    const cityListEl = document.getElementById('cityList');
+    const weatherCard = document.getElementById('weatherCard');
+    const loader = document.getElementById('loader');
+    const errorMsg = document.getElementById('errorMsg');
+    const placeholder = document.getElementById('placeholder');
+
+    // Free weather API — wttr.in — koi API key nahi chahiye
+    // ye JSON format mein weather deta hai bilkul free
+
+    // city list render karne ka function
+    function renderCities() {
+
+      // har city ke liye button banao
+      cities.forEach(city => {
+
+        // naya button element banaya
+        const btn = document.createElement('button');
+        btn.classList.add('city-btn');
+        btn.textContent = city.name;
+
+        // button click pe weather fetch karo
+        btn.addEventListener('click', () => {
+
+          // pehle active class sab se hatao
+          document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+
+          // clicked button pe active class lagao
+          btn.classList.add('active');
+
+          // us city ka weather fetch karo
+          fetchWeather(city);
+        });
+
+        cityListEl.appendChild(btn);
+      });
+    }
+
+    // weather fetch karne ka function
+    async function fetchWeather(city) {
+
+      // sab hide karo pehle
+      weatherCard.style.display = 'none';
+      errorMsg.style.display = 'none';
+      placeholder.style.display = 'none';
+
+      // loader dikhai do
+      loader.style.display = 'block';
+
+      // wttr.in free API use kar rahe hain — format=j1 matlab JSON response
+      const response = await fetch(
+        `https://wttr.in/${encodeURIComponent(city.name)},Pakistan?format=j1`
+      );
+
+      // loader hide karo
+      loader.style.display = 'none';
+
+      // agar response theek nahi aaya
+      if (!response.ok) {
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      // JSON mein convert kiya
+      const data = await response.json();
+
+      // weather card mein data dikhai
+      showWeather(data, city);
+    }
+
+    // weather data card mein dikhane ka function
+    function showWeather(data, city) {
+
+      // current condition nikali data se
+      const current = data.current_condition[0];
+
+      // city name aur province dikhai
+      document.getElementById('cityName').textContent = city.name;
+      document.getElementById('province').textContent = city.province + ' — PAKISTAN';
+
+      // temperature Celsius mein
+      const temp = current.temp_C;
+      document.getElementById('temp').textContent = `${temp}°C`;
+
+      // weather description — English mein hoga
+      const desc = current.weatherDesc[0].value;
+      document.getElementById('description').textContent = desc;
+
+      // temperature ke hisaab se emoji select karo
+      const tempNum = parseInt(temp);
+      let icon = '🌤️';
+      if (tempNum >= 40) icon = '🔥';
+      else if (tempNum >= 30) icon = '☀️';
+      else if (tempNum >= 20) icon = '⛅';
+      else if (tempNum >= 10) icon = '🌥️';
+      else if (tempNum >= 0) icon = '❄️';
+      else icon = '🥶';
+
+      // description mein bhi check karo
+      const descLower = desc.toLowerCase();
+      if (descLower.includes('rain')) icon = '🌧️';
+      if (descLower.includes('thunder')) icon = '⛈️';
+      if (descLower.includes('snow')) icon = '❄️';
+      if (descLower.includes('fog') || descLower.includes('mist')) icon = '🌫️';
+      if (descLower.includes('drizzle')) icon = '🌦️';
+
+      document.getElementById('weatherIcon').textContent = icon;
+
+      // humidity
+      document.getElementById('humidity').textContent = `${current.humidity}%`;
+
+      // wind speed — API kmph mein deta hai
+      document.getElementById('wind').textContent = `${current.windspeedKmph} km/h`;
+
+      // feels like temperature
+      document.getElementById('feelsLike').textContent = `${current.FeelsLikeC}°C`;
+
+      // aaj ka min max temperature
+      const today = data.weather[0];
+      document.getElementById('minMax').textContent =
+        `${today.mintempC}° / ${today.maxtempC}°`;
+
+      // weather card show karo
+      weatherCard.style.display = 'flex';
+    }
+
+    // page load hote hi cities render karo
+    renderCities();
+  </script>
+
+</body>
+</html>

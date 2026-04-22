@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Password Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    #passBox {
+      background: #1a1a1a;
+      border: 2px solid #00d4ff;
+      border-radius: 12px;
+      padding: 20px 30px;
+      font-size: 1.4rem;
+      color: white;
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+      min-width: 350px;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    button {
+      padding: 14px 35px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button:active { transform: scale(0.95); }
+
+    #generateBtn {
+      background: #00d4ff;
+      color: #000;
+    }
+
+    #copyBtn {
+      background: #ffffff15;
+      color: white;
+      border: 2px solid #ffffff33;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 PASSWORD GENERATOR</h1>
+  <div id="passBox">Click Generate!</div>
+  <div class="buttons">
+    <button id="generateBtn">GENERATE</button>
+    <button id="copyBtn">COPY</button>
+  </div>
+
+  <script>
+    // HTML se elements pakad liye
+const generateBtn = document.getElementById('generateBtn');
+const copyBtn = document.getElementById('copyBtn');
+const passBox = document.getElementById('passBox');
+
+// ye sare characters jinka password banega
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+
+// password generate karne wala function
+function generatePassword() {
+
+  // yahan final password store hoga — shuru mein empty
+  let password = '';
+
+  // 12 baar loop chalega — 12 characters ka password banega
+  for (let i = 0; i < 12; i++) {
+
+    // chars string mein se ek random character nikala
+    const randomIndex = Math.floor(Math.random() * chars.length);
+
+    // woh character password mein add kar diya
+    password += chars[randomIndex];
+  }
+
+  // generated password screen pe dikha diya
+  passBox.textContent = password;
+}
+
+// generate button click hone pe function chalao
+generateBtn.addEventListener('click', generatePassword);
+
+// copy button — password clipboard mein copy karo
+copyBtn.addEventListener('click', () => {
+
+  // browser ka built-in clipboard API — text copy karta hai
+  navigator.clipboard.writeText(passBox.textContent);
+
+  // user ko confirm karo ke copy ho gaya
+  copyBtn.textContent = 'COPIED ✅';
+
+  // 2 seconds baad button text wapas normal kar do
+  setTimeout(() => {
+    copyBtn.textContent = 'COPY';
+  }, 2000);
+});
+  </script>
+
+</body>
+</html>

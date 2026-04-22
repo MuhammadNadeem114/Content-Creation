@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Counter</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+  <h1 id="display">0</h1>
+  <button id="btn">CLICK ME</button>
+
+  <script>
+
+
+let count = 0;
+
+//"Pehle ek variable banaya — count — jo zero se shuru hoga.
+//  Ye humara counter hai jo clicks store karega."
+
+const btn = document.getElementById('btn');
+const display = document.getElementById('display');
+
+//Ab JavaScript ko bataya ke HTML mein button kahan hai aur
+//  number display kahan karna hai. getElementById se hum HTML
+//  ko pakad lete hain directly.
+
+btn.addEventListener('click', () => {
+
+ //Ye line bolta hai — jab bhi button click ho, kuch karo.
+ //  addEventListener ek listener lagata hai button pe — woh wait karta hai click ka.
+ //mean perform action when click happens.
+
+
+  count++;
+  // gain 
+  display.textContent = count;
+});
+
+//"Count plus plus — matlab har click pe ek badh jao. Aur display.textContent
+//  se screen pe updated number dikha do. Bas itna hi!"
+
+  </script>
+
+</body>
+</html>

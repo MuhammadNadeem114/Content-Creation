@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Age Calculator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    input {
+      padding: 14px 20px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: 2px solid #00d4ff;
+      background: #1a1a1a;
+      color: white;
+      outline: none;
+      margin-bottom: 20px;
+      width: 250px;
+    }
+
+    button {
+      padding: 14px 40px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s;
+      margin-bottom: 30px;
+    }
+
+    button:active { transform: scale(0.95); }
+
+    #result {
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      width: 300px;
+    }
+
+    .box {
+      background: #1a1a1a;
+      border-left: 4px solid #00d4ff;
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .box span:first-child {
+      color: #ffffff88;
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+    }
+
+    .box span:last-child {
+      color: #00d4ff;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎂 AGE CALCULATOR</h1>
+  <input type="date" id="dobInput" />
+  <button id="calcBtn">CALCULATE</button>
+
+  <div id="result">
+    <div class="box">
+      <span>YEARS</span>
+      <span id="years">0</span>
+    </div>
+    <div class="box">
+      <span>MONTHS</span>
+      <span id="months">0</span>
+    </div>
+    <div class="box">
+      <span>DAYS</span>
+      <span id="days">0</span>
+    </div>
+  </div>
+
+  <script>
+    // HTML se elements pakad liye
+    const calcBtn = document.getElementById('calcBtn');
+    const dobInput = document.getElementById('dobInput');
+    const result = document.getElementById('result');
+    const yearsEl = document.getElementById('years');
+    const monthsEl = document.getElementById('months');
+    const daysEl = document.getElementById('days');
+
+    // calculate button click hone pe chalega
+    calcBtn.addEventListener('click', () => {
+
+      // input ki value li — ye ek date string hogi
+      const dobValue = dobInput.value;
+
+      // agar koi date select nahi ki toh kuch mat karo
+      if (!dobValue) return;
+
+      // input string ko Date object mein convert kiya
+      const dob = new Date(dobValue);
+
+      // aaj ki date li
+      const today = new Date();
+
+      // years calculate kiye — simply year ka farq
+      let years = today.getFullYear() - dob.getFullYear();
+
+      // months calculate kiye — current month minus birth month
+      let months = today.getMonth() - dob.getMonth();
+
+      // days calculate kiye — current day minus birth day
+      let days = today.getDate() - dob.getDate();
+
+      // agar days negative hain toh ek month peeche jao
+      if (days < 0) {
+        months--;
+
+        // pichle month ke kitne din the — woh days mein add karo
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      }
+
+      // agar months negative hain toh ek saal peeche jao
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      // result boxes mein values dikhai
+      yearsEl.textContent = years;
+      monthsEl.textContent = months;
+      daysEl.textContent = days;
+
+      // result section ko visible karo — pehle hidden tha
+      result.style.display = 'flex';
+    });
+  </script>
+
+</body>
+</html>

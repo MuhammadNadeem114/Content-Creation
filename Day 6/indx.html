@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown Timer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    #display {
+      font-size: 7rem;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 30px;
+      transition: color 0.3s;
+    }
+
+    #display.danger { color: #ff4444; }
+
+    input {
+      width: 120px;
+      padding: 12px;
+      text-align: center;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      border: 2px solid #00d4ff;
+      background: #1a1a1a;
+      color: white;
+      outline: none;
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    button {
+      padding: 14px 35px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button:active { transform: scale(0.95); }
+
+    #startBtn { background: #00d4ff; color: #000; }
+    #resetBtn { background: #ffffff15; color: white; border: 2px solid #ffffff33; }
+  </style>
+</head>
+<body>
+
+  <h1>⏳ COUNTDOWN TIMER</h1>
+  <div id="display">00</div>
+  <input type="number" id="timeInput" placeholder="Seconds" min="1" />
+  <div class="buttons">
+    <button id="startBtn">START</button>
+    <button id="resetBtn">RESET</button>
+  </div>
+
+  <script>
+    // HTML se sare elements pakad liye
+    const display = document.getElementById('display');
+    const timeInput = document.getElementById('timeInput');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // timer store karne ke liye variable — null matlab abhi koi timer
+	//  nahi chal raha
+    let timer = null;
+
+    // current time store karne ke liye
+    let timeLeft = 0;
+
+    // start button click hone pe ye function chalega
+    startBtn.addEventListener('click', () => {
+
+      // agar pehle se timer chal raha ho toh dobara mat shuru karo
+      if (timer !== null) return;
+
+      // input ki value li aur integer mein convert kiya
+      timeLeft = parseInt(timeInput.value);
+
+      // agar value empty ya zero ho toh kuch mat karo
+      if (!timeLeft || timeLeft <= 0) return;
+
+      // setInterval har 1 second pe ye code chalata hai
+      timer = setInterval(() => {
+
+        // screen pe current time dikhai
+        display.textContent = timeLeft;
+
+        // jab 10 second bachen toh red color ho jaye
+        if (timeLeft <= 10) {
+          display.classList.add('danger');
+        }
+
+        // agar time zero ho jaye toh timer rok do
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          display.textContent = '💥 BOOM!';
+          timer = null;
+          return;
+        }
+
+        // har second ek kam karo
+        timeLeft--;
+
+      }, 1000);
+    });
+
+    // reset button — sab kuch zero pe le aao
+    resetBtn.addEventListener('click', () => {
+
+      // chal raha timer band karo
+      clearInterval(timer);
+
+      // timer variable reset karo
+      timer = null;
+
+      // display wapas zero karo
+      display.textContent = '00';
+
+      // danger color hatao
+      display.classList.remove('danger');
+
+      // input clear karo
+      timeInput.value = '';
+    });
+  </script>
+
+</body>
+</html>

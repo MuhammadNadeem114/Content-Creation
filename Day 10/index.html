@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notes App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    .input-area {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    input {
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 2px solid #00d4ff;
+      background: #1a1a1a;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    textarea {
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 2px solid #00d4ff;
+      background: #1a1a1a;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      resize: none;
+      height: 120px;
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: #555; }
+
+    button#addBtn {
+      padding: 14px;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button#addBtn:active { transform: scale(0.98); }
+
+    #notesContainer {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .note-card {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 20px;
+      border-left: 4px solid #00d4ff;
+      position: relative;
+    }
+
+    .note-title {
+      color: #00d4ff;
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .note-body {
+      color: #ffffffcc;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .note-date {
+      color: #ffffff33;
+      font-size: 0.75rem;
+      margin-top: 10px;
+    }
+
+    .deleteNote {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #ff444422;
+      border: none;
+      color: #ff4444;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+
+    .deleteNote:hover { background: #ff444444; }
+
+    #emptyMsg {
+      color: #ffffff33;
+      font-size: 1rem;
+      margin-top: 20px;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📝 NOTES APP</h1>
+
+  <div class="input-area">
+    <input type="text" id="titleInput" placeholder="Note title..." />
+    <textarea id="bodyInput" placeholder="Write your note here..."></textarea>
+    <button id="addBtn">SAVE NOTE</button>
+  </div>
+
+  <div id="notesContainer"></div>
+  <p id="emptyMsg">No notes yet. Add one above!</p>
+
+  <script>
+    // HTML se elements pakad liye
+    const titleInput = document.getElementById('titleInput');
+    const bodyInput = document.getElementById('bodyInput');
+    const addBtn = document.getElementById('addBtn');
+    const notesContainer = document.getElementById('notesContainer');
+    const emptyMsg = document.getElementById('emptyMsg');
+
+    // localStorage se saved notes load karo — agar koi nahi toh empty array
+    let notes = JSON.parse(localStorage.getItem('myNotes')) || [];
+
+    // page load hote hi sare notes render karo
+    renderNotes();
+
+    // save button click hone pe
+    addBtn.addEventListener('click', () => {
+
+      // input values lo aur extra spaces hatao
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim();
+
+      // agar dono empty hain toh kuch mat karo
+      if (!title && !body) return;
+
+      // naya note object banaya
+      const note = {
+
+        // unique id ke liye current timestamp use kiya
+        id: Date.now(),
+
+        // note ka title
+        title: title || 'Untitled',
+
+        // note ka content
+        body: body,
+
+        // aaj ki date save ki
+        date: new Date().toLocaleDateString()
+      };
+
+      // note ko array mein add kiya
+      notes.unshift(note);
+
+      // updated array localStorage mein save kiya — string format mein
+      localStorage.setItem('myNotes', JSON.stringify(notes));
+
+      // inputs clear karo
+      titleInput.value = '';
+      bodyInput.value = '';
+
+      // sare notes dobara render karo
+      renderNotes();
+    });
+
+    // sare notes screen pe dikhane ka function
+    function renderNotes() {
+
+      // pehle container clear karo
+      notesContainer.innerHTML = '';
+
+      // agar koi note nahi toh empty message dikhai
+      if (notes.length === 0) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+
+      // empty message hide karo
+      emptyMsg.style.display = 'none';
+
+      // har note ke liye card banao
+      notes.forEach(note => {
+
+        // naya card div banaya
+        const card = document.createElement('div');
+        card.classList.add('note-card');
+
+        // card ke andar content inject kiya
+        card.innerHTML = `
+          <div class="note-title">${note.title}</div>
+          <div class="note-body">${note.body}</div>
+          <div class="note-date">${note.date}</div>
+          <button class="deleteNote">✖ Delete</button>
+        `;
+
+        // delete button pakda
+        card.querySelector('.deleteNote').addEventListener('click', () => {
+
+          // us note ko array se hata diya jiska id match kare
+          notes = notes.filter(n => n.id !== note.id);
+
+          // updated array localStorage mein save kiya
+          localStorage.setItem('myNotes', JSON.stringify(notes));
+
+          // notes dobara render karo
+          renderNotes();
+        });
+
+        // card container mein add kiya
+        notesContainer.appendChild(card);
+      });
+    }
+  </script>
+
+</body>
+</html>

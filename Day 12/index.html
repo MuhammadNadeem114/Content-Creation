@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    .balance-box {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 25px 40px;
+      text-align: center;
+      margin-bottom: 25px;
+      width: 420px;
+      border: 1px solid #ffffff11;
+    }
+
+    .balance-box p {
+      color: #ffffff55;
+      letter-spacing: 3px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    #balance {
+      font-size: 3rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .summary {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      width: 420px;
+    }
+
+    .summary-box {
+      flex: 1;
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      border-top: 3px solid transparent;
+    }
+
+    .summary-box.income { border-top-color: #00ff88; }
+    .summary-box.expense { border-top-color: #ff4444; }
+
+    .summary-box p {
+      color: #ffffff55;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .summary-box span {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .income span { color: #00ff88; }
+    .expense span { color: #ff4444; }
+
+    .form-box {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 25px;
+      width: 420px;
+      margin-bottom: 25px;
+      border: 1px solid #ffffff11;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-box h3 {
+      color: #ffffff88;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      padding: 13px 18px;
+      border-radius: 12px;
+      border: 2px solid #ffffff11;
+      background: #252525;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      width: 100%;
+    }
+
+    input::placeholder { color: #555; }
+
+    select option { background: #252525; }
+
+    button#addBtn {
+      padding: 14px;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button#addBtn:active { transform: scale(0.98); }
+
+    #transactionList {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #transactionList h3 {
+      color: #ffffff55;
+      letter-spacing: 3px;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+
+    .transaction {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid transparent;
+    }
+
+    .transaction.income { border-left-color: #00ff88; }
+    .transaction.expense { border-left-color: #ff4444; }
+
+    .transaction .desc {
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .transaction .date {
+      color: #ffffff44;
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    .transaction .amount {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .transaction.income .amount { color: #00ff88; }
+    .transaction.expense .amount { color: #ff4444; }
+
+    .transaction .delBtn {
+      background: none;
+      border: none;
+      color: #ffffff22;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-left: 12px;
+      transition: color 0.2s;
+    }
+
+    .transaction .delBtn:hover { color: #ff4444; }
+  </style>
+</head>
+<body>
+
+  <h1>💰 EXPENSE TRACKER</h1>
+
+  <div class="balance-box">
+    <p>TOTAL BALANCE</p>
+    <div id="balance">Rs. 0</div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-box income">
+      <p>INCOME</p>
+      <span id="totalIncome">Rs. 0</span>
+    </div>
+    <div class="summary-box expense">
+      <p>EXPENSE</p>
+      <span id="totalExpense">Rs. 0</span>
+    </div>
+  </div>
+
+  <div class="form-box">
+    <h3>ADD TRANSACTION</h3>
+    <input type="text" id="descInput" placeholder="Description (e.g. Salary, Food...)" />
+    <input type="number" id="amountInput" placeholder="Amount (Rs.)" />
+    <select id="typeSelect">
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+    <button id="addBtn">ADD TRANSACTION</button>
+  </div>
+
+  <div id="transactionList">
+    <h3>TRANSACTIONS</h3>
+  </div>
+
+  <script>
+    // HTML se elements pakad liye
+    const descInput = document.getElementById('descInput');
+    const amountInput = document.getElementById('amountInput');
+    const typeSelect = document.getElementById('typeSelect');
+    const addBtn = document.getElementById('addBtn');
+    const transactionList = document.getElementById('transactionList');
+    const balanceEl = document.getElementById('balance');
+    const totalIncomeEl = document.getElementById('totalIncome');
+    const totalExpenseEl = document.getElementById('totalExpense');
+
+    // localStorage se transactions load karo — agar koi nahi toh empty array
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    // page load hote hi render karo
+    renderAll();
+
+    // add button click hone pe
+    addBtn.addEventListener('click', () => {
+
+      // input values lo
+      const desc = descInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const type = typeSelect.value;
+
+      // agar koi field empty ho toh kuch mat karo
+      if (!desc || !amount || amount <= 0) return;
+
+      // naya transaction object banaya
+      const transaction = {
+        id: Date.now(),
+        desc: desc,
+        amount: amount,
+        type: type,
+        date: new Date().toLocaleDateString()
+      };
+
+      // array mein add kiya
+      transactions.unshift(transaction);
+
+      // localStorage mein save kiya
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+
+      // inputs clear karo
+      descInput.value = '';
+      amountInput.value = '';
+
+      // sab render karo
+      renderAll();
+    });
+
+    // sab kuch render karne ka function
+    function renderAll() {
+      renderTransactions();
+      updateSummary();
+    }
+
+    // transactions list render karne ka function
+    function renderTransactions() {
+
+      // pehle list clear karo — heading rakhna hai
+      transactionList.innerHTML = '<h3>TRANSACTIONS</h3>';
+
+      // agar koi transaction nahi
+      if (transactions.length === 0) {
+        transactionList.innerHTML += '<p style="color:#ffffff33; margin-top:10px;">No transactions yet.</p>';
+        return;
+      }
+
+      // har transaction ke liye card banao
+      transactions.forEach(t => {
+
+        // naya div banaya
+        const div = document.createElement('div');
+        div.classList.add('transaction', t.type);
+
+        // content inject kiya
+        div.innerHTML = `
+          <div>
+            <div class="desc">${t.desc}</div>
+            <div class="date">${t.date}</div>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span class="amount">${t.type === 'income' ? '+' : '-'} Rs. ${t.amount.toLocaleString()}</span>
+            <button class="delBtn">✖</button>
+          </div>
+        `;
+
+        // delete button click pe transaction hatao
+        div.querySelector('.delBtn').addEventListener('click', () => {
+
+          // id match karke transaction hatao array se
+          transactions = transactions.filter(item => item.id !== t.id);
+
+          // localStorage update karo
+          localStorage.setItem('transactions', JSON.stringify(transactions));
+
+          // dobara render karo
+          renderAll();
+        });
+
+        transactionList.appendChild(div);
+      });
+    }
+
+    // balance aur summary update karne ka function
+    function updateSummary() {
+
+      // sari incomes ka total nikala — reduce se array sum hoti hai
+      const income = transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      // sare expenses ka total nikala
+      const expense = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      // balance = income minus expense
+      const balance = income - expense;
+
+      // screen pe update kiya
+      balanceEl.textContent = `Rs. ${balance.toLocaleString()}`;
+      totalIncomeEl.textContent = `Rs. ${income.toLocaleString()}`;
+      totalExpenseEl.textContent = `Rs. ${expense.toLocaleString()}`;
+
+      // balance negative ho toh red karo
+      balanceEl.style.color = balance < 0 ? '#ff4444' : 'white';
+    }
+  </script>
+
+</body>
+</html>
