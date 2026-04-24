@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BMI Calculator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    p.sub {
+      color: #ffffff44;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 35px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid #ffffff11;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    label {
+      color: #ffffff66;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 2px solid #ffffff11;
+      background: #252525;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus { border-color: #00d4ff; }
+    input::placeholder { color: #555; }
+
+    button {
+      padding: 15px;
+      border: none;
+      border-radius: 50px;
+      background: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+      margin-top: 5px;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    /* result section */
+    #result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 5px;
+    }
+
+    #bmiValue {
+      font-size: 5rem;
+      font-weight: bold;
+      color: white;
+      line-height: 1;
+    }
+
+    #bmiCategory {
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      padding: 8px 24px;
+      border-radius: 50px;
+    }
+
+    #bmiMsg {
+      color: #ffffff66;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* progress bar */
+    .bar-wrapper {
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .bar-labels span {
+      font-size: 0.65rem;
+      color: #ffffff44;
+      letter-spacing: 1px;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 10px;
+      background: linear-gradient(to right, #00d4ff, #00ff88, #ffaa00, #ff4444);
+      position: relative;
+    }
+
+    #marker {
+      position: absolute;
+      top: -5px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      border: 3px solid #0f0f0f;
+      transform: translateX(-50%);
+      transition: left 0.5s ease;
+    }
+
+    /* category colors */
+    .underweight { background: #00d4ff22; color: #00d4ff; }
+    .normal      { background: #00ff8822; color: #00ff88; }
+    .overweight  { background: #ffaa0022; color: #ffaa00; }
+    .obese       { background: #ff444422; color: #ff4444; }
+  </style>
+</head>
+<body>
+
+  <h1>⚖️ BMI CALCULATOR</h1>
+  <p class="sub">BODY MASS INDEX</p>
+
+  <div class="card">
+
+    <div>
+      <label>HEIGHT (cm)</label>
+      <input type="number" id="heightInput" placeholder="e.g. 175" />
+    </div>
+
+    <div>
+      <label>WEIGHT (kg)</label>
+      <input type="number" id="weightInput" placeholder="e.g. 70" />
+    </div>
+
+    <button id="calcBtn">CALCULATE BMI</button>
+
+    <div id="result">
+
+      <div id="bmiValue">0</div>
+      <div id="bmiCategory">—</div>
+      <div id="bmiMsg"></div>
+
+      <div class="bar-wrapper">
+        <div class="bar-labels">
+          <span>UNDER</span>
+          <span>NORMAL</span>
+          <span>OVER</span>
+          <span>OBESE</span>
+        </div>
+        <div class="bar-track">
+          <div id="marker"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // HTML se elements pakad liye
+    const heightInput = document.getElementById('heightInput');
+    const weightInput = document.getElementById('weightInput');
+    const calcBtn = document.getElementById('calcBtn');
+    const result = document.getElementById('result');
+    const bmiValue = document.getElementById('bmiValue');
+    const bmiCategory = document.getElementById('bmiCategory');
+    const bmiMsg = document.getElementById('bmiMsg');
+    const marker = document.getElementById('marker');
+
+    // calculate button click hone pe
+    calcBtn.addEventListener('click', () => {
+
+      // input values lo aur number mein convert karo
+      const height = parseFloat(heightInput.value);
+      const weight = parseFloat(weightInput.value);
+
+      // agar values invalid hain toh kuch mat karo
+      if (!height || !weight || height <= 0 || weight <= 0) return;
+
+      // height ko cm se meter mein convert kiya
+      const heightM = height / 100;
+
+      // BMI formula — weight divided by height squared
+      const bmi = weight / (heightM * heightM);
+
+      // decimal 1 tak round kiya
+      const bmiRounded = bmi.toFixed(1);
+
+      // BMI value screen pe dikhai
+      bmiValue.textContent = bmiRounded;
+
+      // category aur message decide karo BMI ke hisaab se
+      let category = '';
+      let message = '';
+      let colorClass = '';
+      let markerPos = 0;
+
+      if (bmi < 18.5) {
+
+        // underweight
+        category = 'UNDERWEIGHT';
+        message = 'Aapka weight thoda kam hai. Balanced diet aur doctor se consult karo.';
+        colorClass = 'underweight';
+
+        // marker position 0 se 25% tak
+        markerPos = (bmi / 18.5) * 25;
+
+      } else if (bmi < 25) {
+
+        // normal range
+        category = 'NORMAL ✓';
+        message = 'Mubarak! Aapka weight bilkul theek hai. Aise hi rehne do!';
+        colorClass = 'normal';
+
+        // marker position 25% se 50% tak
+        markerPos = 25 + ((bmi - 18.5) / 6.5) * 25;
+
+      } else if (bmi < 30) {
+
+        // overweight
+        category = 'OVERWEIGHT';
+        message = 'Thoda zyada hai. Exercise aur healthy eating start karo.';
+        colorClass = 'overweight';
+
+        // marker position 50% se 75% tak
+        markerPos = 50 + ((bmi - 25) / 5) * 25;
+
+      } else {
+
+        // obese
+        category = 'OBESE';
+        message = 'Doctor se zaroor milna chahiye. Lifestyle change karna hoga.';
+        colorClass = 'obese';
+
+        // marker position 75% se 100% tak — max 40 BMI tak
+        markerPos = 75 + Math.min(((bmi - 30) / 10) * 25, 25);
+      }
+
+      // category text aur color class update karo
+      bmiCategory.textContent = category;
+
+      // pehle sari classes hatao phir nai lagao
+      bmiCategory.className = '';
+      bmiCategory.classList.add('bmiCategory', colorClass);
+
+      // message update karo
+      bmiMsg.textContent = message;
+
+      // marker ko sahi position pe lao
+      marker.style.left = `${Math.min(markerPos, 98)}%`;
+
+      // result section dikhai do
+      result.style.display = 'flex';
+    });
+
+    // enter key pe bhi calculate ho
+    weightInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') calcBtn.click();
+    });
+  </script>
+
+</body>
+</html>
