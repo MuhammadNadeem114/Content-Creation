@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Typing Speed Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    p.sub {
+      color: #ffffff44;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+
+    /* stats bar */
+    .stats {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      border-top: 3px solid #00d4ff;
+    }
+
+    .stat-box p {
+      color: #ffffff44;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .stat-box span {
+      color: white;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    /* text display */
+    #textDisplay {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 25px;
+      width: 100%;
+      max-width: 620px;
+      font-size: 1.1rem;
+      line-height: 2;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      min-height: 100px;
+      border: 1px solid #ffffff11;
+    }
+
+    /* letter colors */
+    .letter { color: #ffffff44; }
+    .correct { color: #00ff88; }
+    .wrong {
+      color: #ff4444;
+      background: #ff444422;
+      border-radius: 3px;
+    }
+    .current {
+      color: white;
+      border-bottom: 2px solid #00d4ff;
+    }
+
+    /* input area */
+    #typingInput {
+      width: 100%;
+      max-width: 620px;
+      padding: 16px 22px;
+      border-radius: 16px;
+      border: 2px solid #ffffff11;
+      background: #1a1a1a;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border 0.2s;
+      margin-bottom: 20px;
+    }
+
+    #typingInput:focus { border-color: #00d4ff; }
+    #typingInput::placeholder { color: #555; }
+    #typingInput:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* buttons */
+    .btns {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 14px 35px;
+      border: none;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button:active { transform: scale(0.95); }
+
+    #restartBtn {
+      background: #00d4ff;
+      color: #000;
+    }
+
+    #newTextBtn {
+      background: #ffffff15;
+      color: white;
+      border: 2px solid #ffffff22;
+    }
+
+    /* result card */
+    #resultCard {
+      display: none;
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 620px;
+      margin-top: 20px;
+      border: 1px solid #ffffff11;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #resultCard h2 {
+      color: #00d4ff;
+      letter-spacing: 3px;
+      font-size: 1.3rem;
+    }
+
+    .result-stats {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .result-box {
+      flex: 1;
+      background: #252525;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .result-box p {
+      color: #ffffff44;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .result-box span {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+
+    #resultMsg {
+      color: #ffffff88;
+      font-size: 0.95rem;
+      text-align: center;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⌨️ TYPING SPEED TEST</h1>
+  <p class="sub">TYPE AS FAST AS YOU CAN</p>
+
+  <div class="stats">
+    <div class="stat-box">
+      <p>TIME</p>
+      <span id="timer">60</span>
+    </div>
+    <div class="stat-box">
+      <p>WPM</p>
+      <span id="wpm">0</span>
+    </div>
+    <div class="stat-box">
+      <p>ACCURACY</p>
+      <span id="accuracy">100%</span>
+    </div>
+    <div class="stat-box">
+      <p>ERRORS</p>
+      <span id="errors">0</span>
+    </div>
+  </div>
+
+  <div id="textDisplay"></div>
+
+  <input
+    type="text"
+    id="typingInput"
+    placeholder="Yahan type karo — timer shuru ho jayega..."
+  />
+
+  <div class="btns">
+    <button id="restartBtn">↺ RESTART</button>
+    <button id="newTextBtn">NEW TEXT</button>
+  </div>
+
+  <div id="resultCard">
+    <h2>🎉 TEST COMPLETE</h2>
+    <div class="result-stats">
+      <div class="result-box">
+        <p>WPM</p>
+        <span id="finalWpm">0</span>
+      </div>
+      <div class="result-box">
+        <p>ACCURACY</p>
+        <span id="finalAccuracy">0%</span>
+      </div>
+      <div class="result-box">
+        <p>ERRORS</p>
+        <span id="finalErrors">0</span>
+      </div>
+    </div>
+    <div id="resultMsg"></div>
+  </div>
+
+  <script>
+    // practice ke liye texts — array mein multiple paragraphs
+    const texts = [
+      "JavaScript is the language of the web. Every website you visit uses it to make things interactive and dynamic.",
+      "Good developers write code that humans can read. Clean code is more important than clever code in real projects.",
+      "Practice makes perfect. The more you code every day, the faster and better you will become as a developer.",
+      "Functions are the building blocks of JavaScript. They help us organize code and avoid repeating ourselves.",
+      "Arrays and objects are used everywhere in JavaScript. Mastering them is the key to becoming a strong developer."
+    ];
+
+    // HTML se elements pakad liye
+    const textDisplay = document.getElementById('textDisplay');
+    const typingInput = document.getElementById('typingInput');
+    const timerEl = document.getElementById('timer');
+    const wpmEl = document.getElementById('wpm');
+    const accuracyEl = document.getElementById('accuracy');
+    const errorsEl = document.getElementById('errors');
+    const restartBtn = document.getElementById('restartBtn');
+    const newTextBtn = document.getElementById('newTextBtn');
+    const resultCard = document.getElementById('resultCard');
+
+    // game state variables
+    let currentText = '';
+    let timer = null;
+    let timeLeft = 60;
+    let started = false;
+    let totalTyped = 0;
+    let totalErrors = 0;
+    let currentIndex = 0;
+
+    // random text select karne ka function
+    function getRandomText() {
+
+      // array se random index nikala
+      const index = Math.floor(Math.random() * texts.length);
+      return texts[index];
+    }
+
+    // text display render karne ka function
+    function renderText() {
+
+      // pehle display clear karo
+      textDisplay.innerHTML = '';
+
+      // har letter ke liye ek span banao
+      currentText.split('').forEach((char, index) => {
+
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.classList.add('letter');
+
+        // pehla letter current dikhao
+        if (index === 0) span.classList.add('current');
+
+        textDisplay.appendChild(span);
+      });
+    }
+
+    // game initialize karne ka function
+    function initGame() {
+
+      // timer reset karo
+      clearInterval(timer);
+      timeLeft = 60;
+      started = false;
+      totalTyped = 0;
+      totalErrors = 0;
+      currentIndex = 0;
+
+      // stats reset karo
+      timerEl.textContent = '60';
+      wpmEl.textContent = '0';
+      accuracyEl.textContent = '100%';
+      errorsEl.textContent = '0';
+
+      // result card hide karo
+      resultCard.style.display = 'none';
+
+      // input enable aur clear karo
+      typingInput.disabled = false;
+      typingInput.value = '';
+      typingInput.focus();
+
+      // text render karo
+      renderText();
+    }
+
+    // timer shuru karne ka function
+    function startTimer() {
+
+      // har second ye chalega
+      timer = setInterval(() => {
+
+        // time ek second kam karo
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+
+        // agar time khatam ho jaye
+        if (timeLeft <= 0) {
+
+          // timer band karo
+          clearInterval(timer);
+
+          // input disable karo
+          typingInput.disabled = true;
+
+          // result dikhai do
+          showResult();
+        }
+
+      }, 1000);
+    }
+
+    // typing input pe har key press hone pe
+    typingInput.addEventListener('input', () => {
+
+      // agar pehli baar type ho raha hai toh timer start karo
+      if (!started) {
+        started = true;
+        startTimer();
+      }
+
+      // jo type kiya uski last character nikali
+      const typedChar = typingInput.value[typingInput.value.length - 1];
+
+      // agar text khatam ho gaya
+      if (currentIndex >= currentText.length) return;
+
+      // sare letter spans nikale
+      const letters = textDisplay.querySelectorAll('span');
+
+      // current letter ka correct character
+      const correctChar = currentText[currentIndex];
+
+      // total typed count badao
+      totalTyped++;
+
+      // correct ya wrong check karo
+      if (typedChar === correctChar) {
+
+        // sahi — green karo
+        letters[currentIndex].classList.remove('current');
+        letters[currentIndex].classList.add('correct');
+
+      } else {
+
+        // galat — red karo aur error count badao
+        letters[currentIndex].classList.remove('current');
+        letters[currentIndex].classList.add('wrong');
+        totalErrors++;
+        errorsEl.textContent = totalErrors;
+      }
+
+      // next letter pe jao
+      currentIndex++;
+
+      // agar aur letter hai toh current class lagao
+      if (currentIndex < currentText.length) {
+        letters[currentIndex].classList.add('current');
+      }
+
+      // input clear karo next character ke liye
+      typingInput.value = '';
+
+      // WPM calculate karo — words per minute
+      // ek word = 5 characters maana jata hai standard mein
+      const minutes = (60 - timeLeft) / 60;
+      if (minutes > 0) {
+        const wpm = Math.round((currentIndex / 5) / minutes);
+        wpmEl.textContent = wpm;
+      }
+
+      // accuracy calculate karo
+      const accuracy = Math.round(((totalTyped - totalErrors) / totalTyped) * 100);
+      accuracyEl.textContent = `${accuracy}%`;
+
+      // agar poora text type ho gaya
+      if (currentIndex >= currentText.length) {
+        clearInterval(timer);
+        typingInput.disabled = true;
+        showResult();
+      }
+    });
+
+    // result dikhane ka function
+    function showResult() {
+
+      // final WPM nikala
+      const minutes = (60 - timeLeft) / 60 || 1;
+      const finalWpm = Math.round((currentIndex / 5) / minutes);
+
+      // final accuracy nikali
+      const finalAccuracy = totalTyped > 0
+        ? Math.round(((totalTyped - totalErrors) / totalTyped) * 100)
+        : 100;
+
+      // result card mein values daali
+      document.getElementById('finalWpm').textContent = finalWpm;
+      document.getElementById('finalAccuracy').textContent = `${finalAccuracy}%`;
+      document.getElementById('finalErrors').textContent = totalErrors;
+
+      // performance ke hisaab se message
+      let msg = '';
+      if (finalWpm >= 60) msg = '🔥 Zabardast! Tum professional typer ho!';
+      else if (finalWpm >= 40) msg = '👍 Acha hai! Thodi aur practice karo.';
+      else if (finalWpm >= 20) msg = '💪 Theek hai! Daily practice se speed badhegi.';
+      else msg = '🐢 Slow hai abhi — koi baat nahi, practice karte raho!';
+
+      document.getElementById('resultMsg').textContent = msg;
+
+      // result card dikhai do
+      resultCard.style.display = 'flex';
+    }
+
+    // restart button — same text pe dobara khelo
+    restartBtn.addEventListener('click', () => {
+      initGame();
+    });
+
+    // new text button — naya random text lo
+    newTextBtn.addEventListener('click', () => {
+
+      // naya random text select karo
+      currentText = getRandomText();
+      initGame();
+    });
+
+    // page load hote hi game shuru karo
+    currentText = getRandomText();
+    initGame();
+  </script>
+
+</body>
+</html>
