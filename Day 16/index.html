@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rock Paper Scissors</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f0f;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00d4ff;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    p.sub {
+      color: #ffffff44;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+
+    /* score board */
+    .scoreboard {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .score-box {
+      flex: 1;
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .score-box.you { border-top: 3px solid #00ff88; }
+    .score-box.draw { border-top: 3px solid #ffffff33; }
+    .score-box.computer { border-top: 3px solid #ff4444; }
+
+    .score-box p {
+      color: #ffffff44;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .score-box span {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* battle area */
+    .battle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 25px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .player-side {
+      flex: 1;
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: border 0.3s;
+    }
+
+    .player-side.win { border-color: #00ff88; }
+    .player-side.lose { border-color: #ff4444; }
+    .player-side.draw-border { border-color: #ffffff33; }
+
+    .player-side p {
+      color: #ffffff44;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .choice-display {
+      font-size: 3.5rem;
+      transition: transform 0.3s;
+    }
+
+    .vs {
+      color: #ffffff33;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    /* result message */
+    #resultMsg {
+      font-size: 1.3rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+      color: #ffffff44;
+      transition: color 0.3s;
+    }
+
+    #resultMsg.win { color: #00ff88; }
+    #resultMsg.lose { color: #ff4444; }
+    #resultMsg.draw { color: #ffffff88; }
+
+    /* choice buttons */
+    .choices {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .choice-btn {
+      background: #1a1a1a;
+      border: 2px solid #ffffff11;
+      border-radius: 20px;
+      padding: 20px 25px;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .choice-btn span.label {
+      font-size: 0.7rem;
+      color: #ffffff44;
+      letter-spacing: 2px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .choice-btn:hover {
+      border-color: #00d4ff;
+      background: #00d4ff11;
+      transform: translateY(-5px);
+    }
+
+    .choice-btn:active { transform: scale(0.95); }
+
+    /* reset button */
+    #resetBtn {
+      padding: 12px 35px;
+      border: none;
+      border-radius: 50px;
+      background: #ffffff15;
+      color: white;
+      border: 2px solid #ffffff22;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: transform 0.1s;
+    }
+
+    #resetBtn:active { transform: scale(0.95); }
+
+    /* shake animation */
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      75% { transform: rotate(15deg); }
+    }
+
+    .shake { animation: shake 0.4s ease; }
+  </style>
+</head>
+<body>
+
+  <h1>✊ ROCK PAPER SCISSORS</h1>
+  <p class="sub">CHOOSE YOUR WEAPON</p>
+
+  <div class="scoreboard">
+    <div class="score-box you">
+      <p>YOU</p>
+      <span id="yourScore">0</span>
+    </div>
+    <div class="score-box draw">
+      <p>DRAW</p>
+      <span id="drawScore">0</span>
+    </div>
+    <div class="score-box computer">
+      <p>COMPUTER</p>
+      <span id="compScore">0</span>
+    </div>
+  </div>
+
+  <div class="battle">
+    <div class="player-side" id="yourSide">
+      <p>YOU</p>
+      <div class="choice-display" id="yourChoice">❓</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="player-side" id="compSide">
+      <p>COMPUTER</p>
+      <div class="choice-display" id="compChoice">❓</div>
+    </div>
+  </div>
+
+  <div id="resultMsg">CHOOSE YOUR WEAPON!</div>
+
+  <div class="choices">
+    <button class="choice-btn" data-choice="rock">
+      ✊
+      <span class="label">ROCK</span>
+    </button>
+    <button class="choice-btn" data-choice="paper">
+      ✋
+      <span class="label">PAPER</span>
+    </button>
+    <button class="choice-btn" data-choice="scissors">
+      ✌️
+      <span class="label">SCISSORS</span>
+    </button>
+  </div>
+
+  <button id="resetBtn">↺ RESET SCORE</button>
+
+  <script>
+    // choices array — computer random choice ke liye
+    const choices = ['rock', 'paper', 'scissors'];
+
+    // har choice ka emoji
+    const emojis = {
+      rock: '✊',
+      paper: '✋',
+      scissors: '✌️'
+    };
+
+    // score variables
+    let yourScore = 0;
+    let compScore = 0;
+    let drawScore = 0;
+
+    // HTML elements pakad liye
+    const yourChoiceEl = document.getElementById('yourChoice');
+    const compChoiceEl = document.getElementById('compChoice');
+    const resultMsg = document.getElementById('resultMsg');
+    const yourSide = document.getElementById('yourSide');
+    const compSide = document.getElementById('compSide');
+    const yourScoreEl = document.getElementById('yourScore');
+    const compScoreEl = document.getElementById('compScore');
+    const drawScoreEl = document.getElementById('drawScore');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // sare choice buttons pe event lagao
+    document.querySelectorAll('.choice-btn').forEach(btn => {
+
+      btn.addEventListener('click', () => {
+
+        // player ki choice data attribute se nikali
+        const playerChoice = btn.dataset.choice;
+
+        // computer ki random choice
+        const compChoice = choices[Math.floor(Math.random() * choices.length)];
+
+        // choices display karo
+        yourChoiceEl.textContent = emojis[playerChoice];
+        compChoiceEl.textContent = emojis[compChoice];
+
+        // shake animation dono sides pe
+        yourChoiceEl.classList.remove('shake');
+        compChoiceEl.classList.remove('shake');
+
+        // animation dobara trigger karne ke liye void trick
+        void yourChoiceEl.offsetWidth;
+        yourChoiceEl.classList.add('shake');
+        compChoiceEl.classList.add('shake');
+
+        // pehle borders reset karo
+        yourSide.className = 'player-side';
+        compSide.className = 'player-side';
+        resultMsg.className = '';
+
+        // game result decide karo
+        if (playerChoice === compChoice) {
+
+          // draw
+          drawScore++;
+          drawScoreEl.textContent = drawScore;
+          resultMsg.textContent = "🤝 DRAW!";
+          resultMsg.classList.add('draw');
+          yourSide.classList.add('draw-border');
+          compSide.classList.add('draw-border');
+
+        } else if (
+          (playerChoice === 'rock'     && compChoice === 'scissors') ||
+          (playerChoice === 'paper'    && compChoice === 'rock')     ||
+          (playerChoice === 'scissors' && compChoice === 'paper')
+        ) {
+
+          // player jeeta
+          yourScore++;
+          yourScoreEl.textContent = yourScore;
+          resultMsg.textContent = "🎉 YOU WIN!";
+          resultMsg.classList.add('win');
+          yourSide.classList.add('win');
+          compSide.classList.add('lose');
+
+        } else {
+
+          // computer jeeta
+          compScore++;
+          compScoreEl.textContent = compScore;
+          resultMsg.textContent = "💀 YOU LOSE!";
+          resultMsg.classList.add('lose');
+          yourSide.classList.add('lose');
+          compSide.classList.add('win');
+        }
+      });
+    });
+
+    // reset button — sab zero karo
+    resetBtn.addEventListener('click', () => {
+
+      // scores reset
+      yourScore = 0;
+      compScore = 0;
+      drawScore = 0;
+
+      // screen pe update karo
+      yourScoreEl.textContent = 0;
+      compScoreEl.textContent = 0;
+      drawScoreEl.textContent = 0;
+
+      // choices reset
+      yourChoiceEl.textContent = '❓';
+      compChoiceEl.textContent = '❓';
+
+      // message reset
+      resultMsg.textContent = 'CHOOSE YOUR WEAPON!';
+      resultMsg.className = '';
+
+      // borders reset
+      yourSide.className = 'player-side';
+      compSide.className = 'player-side';
+    });
+  </script>
+
+</body>
+</html>
